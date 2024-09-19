@@ -213,7 +213,7 @@ const adminLoginController = async (req: Request, res: Response, next: NextFunct
       lastName: admin?.lastName,
       emailAddress: admin.emailAddress,
       phoneNumber: admin.phoneNumber,
-      adminRoleID: admin.admin_rolesId,
+      adminRoleID: admin.adminRoleID,
     };
 
     // Create JwtPayload instance for Access Token

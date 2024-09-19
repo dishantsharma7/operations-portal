@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { check, validationResult } from 'express-validator';
 
-export const validateClientRegisterEmailRequest = [
+export const validateWriterCompanyRegisterEmailRequest = [
   check('emailAddress')
     .notEmpty()
     .withMessage('Email address is required')
@@ -9,7 +9,7 @@ export const validateClientRegisterEmailRequest = [
     .withMessage('Inavlid email Address'),
 ];
 
-export const validateClientRegisterPhoneRequest = [
+export const validateWriterCompanyRegisterPhoneRequest = [
   check('phoneNumber')
     .custom((value, { req }) => {
       if (!value || value.trim() === '') {
@@ -22,11 +22,11 @@ export const validateClientRegisterPhoneRequest = [
     .withMessage('Invalid phone number'),
 ];
 
-export const validateClientRegisterUsernameRequest = [
+export const validateWriterCompanyRegisterUsernameRequest = [
   check('userName').notEmpty().withMessage('Username is required'),
 ];
 
-export const validateClientRegisterRequest = [
+export const validateWriterCompanyRegisterRequest = [
   check('firstName').notEmpty().withMessage('First name is required'),
   check('lastName').notEmpty().withMessage('Last name is required'),
   check('emailAddress')
@@ -48,7 +48,7 @@ export const validateClientRegisterRequest = [
     .withMessage('Invalid phone number'),
 ];
 
-export const validateClientLoginRequest = [
+export const validateWriterCompanyLoginRequest = [
   check('emailAddress').notEmpty().withMessage('Email is required'),
   check('password').notEmpty().withMessage('Password is required'),
 ];
