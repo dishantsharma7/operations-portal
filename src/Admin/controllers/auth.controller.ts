@@ -99,8 +99,8 @@ const checkNewAdminEmailValidityController = async (req: Request, res: Response,
     const { email } = req.body;
 
     const formattedValue = email.toLowerCase().trim();
-    const admin = await prisma_client.admin_users.findUnique({
-      where: { email: formattedValue },
+    const admin = await prisma_client.admin_user.findUnique({
+      where: { emailAddress: formattedValue },
     });
 
     if (admin?.id) {
@@ -115,8 +115,8 @@ const checkNewAdminEmailValidityController = async (req: Request, res: Response,
       const result = await generateUniqueUsername(formattedValue);
       generatedUsernames = result.username;
 
-      const existingUsername = await prisma_client.admin_users.findUnique({
-        where: { userName: generatedUsernames },
+      const existingUsername = await prisma_client.admin_user.findUnique({
+        where: { username: generatedUsernames },
       });
 
       isUsernameUnique = !existingUsername;
@@ -132,7 +132,7 @@ const checkNewAdminPhoneValidityController = async (req: Request, res: Response,
     const { phoneNumber } = req.body;
 
     const formattedValue = phoneNumber.toLowerCase().trim();
-    const admin = await prisma_client.admin_users.findUnique({
+    const admin = await prisma_client.admin_user.findUnique({
       where: { phoneNumber: formattedValue },
     });
 
@@ -147,11 +147,11 @@ const checkNewAdminPhoneValidityController = async (req: Request, res: Response,
 };
 const checkNewAdminUsernameValidityController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { userName } = req.body;
+    const { username } = req.body;
 
-    const formattedValue = userName.trim();
-    const admin = await prisma_client.admin_users.findUnique({
-      where: { userName: userName },
+    const formattedValue = username.trim();
+    const admin = await prisma_client.admin_user.findUnique({
+      where: { username: formattedValue },
     });
 
     if (admin?.id) {
@@ -184,9 +184,9 @@ const secureCookieOptions: CookieOptions = {
 
 const adminLoginController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, password } = req.body;
+    const { emailAddress, password } = req.body;
 
-    const admin = await AuthService.adminLoginService(email, password);
+    const admin = await AuthService.adminLoginService(emailAddress, password);
 
     if (!admin) {
       throw new AuthFailureError(`User doesn't exist`);
@@ -199,9 +199,9 @@ const adminLoginController = async (req: Request, res: Response, next: NextFunct
     }
 
     const id = admin.id;
-    const issuer = 'POG-API';
+    const issuer = 'OPR-API';
     const audience = id.toString();
-    const subject = admin.userName;
+    const subject = admin.username;
     const param = 'admin';
     const accessTokenValidity = 3600; // 1 hour
     // const accessTokenValidity = 60; // 1 hour
@@ -211,7 +211,7 @@ const adminLoginController = async (req: Request, res: Response, next: NextFunct
     const user = {
       firstName: admin.firstName,
       lastName: admin?.lastName,
-      emailAddress: admin.email,
+      emailAddress: admin.emailAddress,
       phoneNumber: admin.phoneNumber,
       adminRoleID: admin.admin_rolesId,
     };

@@ -33,6 +33,7 @@ model admin_user {
   username      String   @unique
   password      String
   userImage     String?
+  userType      String   @default("admin")
   adminRoleID   Int
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -63,6 +64,7 @@ model client_user {
   username      String   @unique
   password      String
   userImage     String?
+  userType      String   @default("client")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   enabled       Boolean  @default(true)
@@ -86,6 +88,7 @@ model writer_company_user {
   zipcode       String
   username      String   @unique
   password      String
+  userType      String   @default("writer_company")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   enabled       Boolean  @default(true)
@@ -113,6 +116,7 @@ model writer_user {
   username      String   @unique
   password      String
   userImage     String?
+  userType      String   @default("writer")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   enabled       Boolean  @default(true)

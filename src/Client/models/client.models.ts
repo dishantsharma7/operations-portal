@@ -1,15 +1,4 @@
-export interface createAdminAccessPermissionsInterface {
-  accessPermissionName: string;
-  slug: string;
-}
-
-export interface createAdminRolesInterface {
-  roleName: string; //@unique
-  slug: string;
-  permissions: { id: string }[];
-}
-
-export interface adminRegisterInterface {
+export interface clientRegisterInterface {
 
   firstName: string;
   lastName?: string;
@@ -17,7 +6,6 @@ export interface adminRegisterInterface {
   password: string;
   username: string;
   phoneNumber: string;
-  admin_rolesId: string;
   addressLine1: string;
   addressLine2: string;
   city: string;
@@ -30,7 +18,7 @@ export interface adminRegisterInterface {
   userImage: string;
 }
 
-export interface adminDetailsInterface {
+export interface clientDetailsInterface {
   firstName: string;
   lastName?: string;
   emailAddress: string;
@@ -47,11 +35,5 @@ export interface adminDetailsInterface {
   gender?: string;
   dateOfBirth?: string;
   userImage?: string;
-  admin_rolesId: string;
-  decodeToken: {
-    username: string;
-    id: number;
-    roleName: string;
-  };
 }
 
