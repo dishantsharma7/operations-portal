@@ -7,7 +7,7 @@ import JWT, { JwtPayload } from '../../core/JWT';
 import { cookieOptions } from '../../utils/cookieOptions';
 import prisma_client from '../../config/prisma';
 import { generateUniqueUsername } from '../../utils/generateUserName';
-import { adminPermissions, restaurantPermissions } from '../../utils/adminPermissionData';
+import { adminPermissions} from '../../utils/adminPermissionData';
 
 // Roles and Permissions
 const checkNewPermissionValidityController = async (req: Request, res: Response, next: NextFunction) => {
@@ -231,7 +231,7 @@ const adminLoginController = async (req: Request, res: Response, next: NextFunct
           userType: admin?.userType,
           firstName: admin?.firstName,
           lastName: admin?.lastName,
-          email: admin?.email,
+          emailAddress: admin?.emailAddress,
           id: admin?.id,
           restaurantID: null,
           permissions: admin?.admin_roles?.admin_permissions,
