@@ -75,8 +75,8 @@ model client_user {
 model writer_company_user {
   id            Int      @id @default(autoincrement())
   companyName   String
-  firstName     String
-  lastName      String
+  POCFirstName     String
+  POCLastName      String
   emailAddress  String   @unique
   countryCode   String
   phoneNumber   String

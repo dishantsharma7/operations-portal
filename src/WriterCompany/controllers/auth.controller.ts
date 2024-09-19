@@ -9,17 +9,17 @@ import prisma_client from '../../config/prisma';
 import { generateUniqueUsername } from '../../utils/generateUserName';
 
 
-// Client Users
-const checkNewClientEmailValidityController = async (req: Request, res: Response, next: NextFunction) => {
+// Writer Company Users
+const checkNewWriterCompanyEmailValidityController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email } = req.body;
 
     const formattedValue = email.toLowerCase().trim();
-    const client = await prisma_client.client_user.findUnique({
+    const writerCompany = await prisma_client.writer_company_user.findUnique({
       where: { emailAddress: formattedValue },
     });
 
-    if (client?.id) {
+    if (writerCompany?.id) {
       throw new BadRequestError(`Email already exists`);
     }
 
@@ -31,7 +31,7 @@ const checkNewClientEmailValidityController = async (req: Request, res: Response
       const result = await generateUniqueUsername(formattedValue);
       generatedUsernames = result.username;
 
-      const existingUsername = await prisma_client.client_user.findUnique({
+      const existingUsername = await prisma_client.writer_company_user.findUnique({
         where: { username: generatedUsernames },
       });
 
@@ -43,16 +43,16 @@ const checkNewClientEmailValidityController = async (req: Request, res: Response
     next(error);
   }
 };
-const checkNewClientPhoneValidityController = async (req: Request, res: Response, next: NextFunction) => {
+const checkNewWriterCompanyPhoneValidityController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { phoneNumber } = req.body;
 
     const formattedValue = phoneNumber.toLowerCase().trim();
-    const client = await prisma_client.client_user.findUnique({
+    const writerCompany = await prisma_client.writer_company_user.findUnique({
       where: { phoneNumber: formattedValue },
     });
 
-    if (client?.id) {
+    if (writerCompany?.id) {
       throw new BadRequestError(`Phone Number already exists`);
     }
 
@@ -61,16 +61,16 @@ const checkNewClientPhoneValidityController = async (req: Request, res: Response
     next(error);
   }
 };
-const checkNewClientUsernameValidityController = async (req: Request, res: Response, next: NextFunction) => {
+const checkNewWriterCompanyUsernameValidityController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { username } = req.body;
 
     const formattedValue = username.trim();
-    const client = await prisma_client.client_user.findUnique({
+    const writerCompany = await prisma_client.writer_company_user.findUnique({
       where: { username: username },
     });
 
-    if (client?.id) {
+    if (writerCompany?.id) {
       throw new BadRequestError(`Username already exists`);
     }
 
@@ -80,13 +80,13 @@ const checkNewClientUsernameValidityController = async (req: Request, res: Respo
   }
 };
 
-const clientRegisterController = async (req: Request, res: Response, next: NextFunction) => {
+const writerCompanyRegisterController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const clientRegisterData = req.body;
-    const userRegistrationResponse = await AuthService.clientRegisterService(clientRegisterData);
+    const writerCompanyRegisterData = req.body;
+    const userRegistrationResponse = await AuthService.writerCompanyRegisterService(writerCompanyRegisterData);
     return userRegistrationResponse.send(res);
   } catch (error) {
-    console.log('🚀 ~ clientRegisterController ~ error:', error);
+    console.log('🚀 ~ writerCompanyRegisterController ~ error:', error);
     next(error);
   }
 };
@@ -98,37 +98,37 @@ const secureCookieOptions: CookieOptions = {
   path: '/', // Cookie is valid for the entire domain
 };
 
-const clientLoginController = async (req: Request, res: Response, next: NextFunction) => {
+const writerCompanyLoginController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { emailAddress, password } = req.body;
 
-    const client = await AuthService.clientLoginService(emailAddress, password);
+    const writerCompany = await AuthService.writerCompanyLoginService(emailAddress, password);
 
-    if (!client) {
+    if (!writerCompany) {
       throw new AuthFailureError(`User doesn't exist`);
     }
 
-    const isPasswordValid = await comparePassword(password, client.password);
+    const isPasswordValid = await comparePassword(password, writerCompany.password);
 
     if (!isPasswordValid) {
       throw new AuthFailureError('Incorrect password');
     }
 
-    const id = client.id;
+    const id = writerCompany.id;
     const issuer = 'OPR-API';
     const audience = id.toString();
-    const subject = client.username;
-    const param = 'client';
+    const subject = writerCompany.username;
+    const param = 'writerCompany';
     const accessTokenValidity = 3600; // 1 hour
     // const accessTokenValidity = 60; // 1 hour
     const refreshTokenValidity = 7 * 24 * 60 * 60 * 1000; // 7 days
     // const refreshTokenValidity = 300; // 7 days
 
     const user = {
-      firstName: client.firstName,
-      lastName: client?.lastName,
-      emailAddress: client.emailAddress,
-      phoneNumber: client.phoneNumber,
+      POCFirstName: writerCompany.POCFirstName,
+      POCLastName: writerCompany?.POCLastName,
+      emailAddress: writerCompany.emailAddress,
+      phoneNumber: writerCompany.phoneNumber,
     };
 
     // Create JwtPayload instance for Access Token
@@ -143,17 +143,17 @@ const clientLoginController = async (req: Request, res: Response, next: NextFunc
       success: true,
       data: {
         userInfo: {
-          userType: client?.userType,
-          firstName: client?.firstName,
-          lastName: client?.lastName,
-          emailAddress: client?.emailAddress,
-          id: client?.id,},
+          userType: writerCompany?.userType,
+          POCFirstName: writerCompany?.POCFirstName,
+          POCLastName: writerCompany?.POCLastName,
+          emailAddress: writerCompany?.emailAddress,
+          id: writerCompany?.id,},
         access_token: accessToken,
-        refresh_token: refreshToken, // Optional: send refresh token to client
+        refresh_token: refreshToken, // Optional: send refresh token to writerCompany
       },
     });
   } catch (error) {
-    console.error('Error in Client login:', error);
+    console.error('Error in writerCompany login:', error);
     next(error);
   }
 };
@@ -202,9 +202,9 @@ const clientLoginController = async (req: Request, res: Response, next: NextFunc
 // };
 
 export {
-  clientRegisterController,
-  clientLoginController,
-  checkNewClientEmailValidityController,
-  checkNewClientUsernameValidityController,
-  checkNewClientPhoneValidityController,
+  writerCompanyRegisterController,
+  writerCompanyLoginController,
+  checkNewWriterCompanyEmailValidityController,
+  checkNewWriterCompanyUsernameValidityController,
+  checkNewWriterCompanyPhoneValidityController,
 };

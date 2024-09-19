@@ -52,7 +52,7 @@ const adminRegisterService = async (adminRegistrationData: adminRegisterInterfac
   return registrationResponse;
 };
 
-const adminLoginService = async (email: string, password: string) => {
+const adminLoginService = async (emailAddress: string, password: string) => {
   const admin = await prisma_client.admin_user.findUnique({
     where: { emailAddress: emailAddress },
     include: {
