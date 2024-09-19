@@ -1,16 +1,23 @@
-import { CookieOptions, NextFunction, Request, Response } from 'express';
-import { InternalErrorResponse, SuccessMsgResponse, SuccessResponse } from '../../core/ApiResponse';
-import * as AuthService from '../services/auth.services';
-import { AuthFailureError, BadRequestError } from '../../core/ApiError';
-import { comparePassword } from '../../core/utils';
-import JWT, { JwtPayload } from '../../core/JWT';
-import { cookieOptions } from '../../utils/cookieOptions';
-import prisma_client from '../../config/prisma';
-import { generateUniqueUsername } from '../../utils/generateUserName';
-
+import { CookieOptions, NextFunction, Request, Response } from "express";
+import {
+  InternalErrorResponse,
+  SuccessMsgResponse,
+  SuccessResponse,
+} from "../../core/ApiResponse";
+import * as AuthService from "../services/auth.services";
+import { AuthFailureError, BadRequestError } from "../../core/ApiError";
+import { comparePassword } from "../../core/utils";
+import JWT, { JwtPayload } from "../../core/JWT";
+import { cookieOptions } from "../../utils/cookieOptions";
+import prisma_client from "../../config/prisma";
+import { generateUniqueUsername } from "../../utils/generateUserName";
 
 // Client Users
-const checkNewClientEmailValidityController = async (req: Request, res: Response, next: NextFunction) => {
+const checkNewClientEmailValidityController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { email } = req.body;
 
@@ -38,12 +45,18 @@ const checkNewClientEmailValidityController = async (req: Request, res: Response
       isUsernameUnique = !existingUsername;
     }
 
-    return new SuccessResponse(`Email is valid`, { username: generatedUsernames }).send(res);
+    return new SuccessResponse(`Email is valid`, {
+      username: generatedUsernames,
+    }).send(res);
   } catch (error) {
     next(error);
   }
 };
-const checkNewClientPhoneValidityController = async (req: Request, res: Response, next: NextFunction) => {
+const checkNewClientPhoneValidityController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { phoneNumber } = req.body;
 
@@ -61,7 +74,11 @@ const checkNewClientPhoneValidityController = async (req: Request, res: Response
     next(error);
   }
 };
-const checkNewClientUsernameValidityController = async (req: Request, res: Response, next: NextFunction) => {
+const checkNewClientUsernameValidityController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { username } = req.body;
 
@@ -80,25 +97,35 @@ const checkNewClientUsernameValidityController = async (req: Request, res: Respo
   }
 };
 
-const clientRegisterController = async (req: Request, res: Response, next: NextFunction) => {
+const clientRegisterController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const clientRegisterData = req.body;
-    const userRegistrationResponse = await AuthService.clientRegisterService(clientRegisterData);
+    const userRegistrationResponse = await AuthService.clientRegisterService(
+      clientRegisterData
+    );
     return userRegistrationResponse.send(res);
   } catch (error) {
-    console.log('🚀 ~ clientRegisterController ~ error:', error);
+    console.log("🚀 ~ clientRegisterController ~ error:", error);
     next(error);
   }
 };
 
 const secureCookieOptions: CookieOptions = {
   httpOnly: true, // Cookie is not accessible via JavaScript
-  secure: process.env.NODE_ENV === 'production', // Cookie is sent only over HTTPS in production
-  sameSite: 'none', // Ensure this matches the allowed values
-  path: '/', // Cookie is valid for the entire domain
+  secure: process.env.NODE_ENV === "production", // Cookie is sent only over HTTPS in production
+  sameSite: "none", // Ensure this matches the allowed values
+  path: "/", // Cookie is valid for the entire domain
 };
 
-const clientLoginController = async (req: Request, res: Response, next: NextFunction) => {
+const clientLoginController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { emailAddress, password } = req.body;
 
@@ -111,14 +138,14 @@ const clientLoginController = async (req: Request, res: Response, next: NextFunc
     const isPasswordValid = await comparePassword(password, client.password);
 
     if (!isPasswordValid) {
-      throw new AuthFailureError('Incorrect password');
+      throw new AuthFailureError("Incorrect password");
     }
 
     const id = client.id;
-    const issuer = 'OPR-API';
+    const issuer = "OPR-API";
     const audience = id.toString();
     const subject = client.username;
-    const param = 'client';
+    const param = "client";
     const accessTokenValidity = 3600; // 1 hour
     // const accessTokenValidity = 60; // 1 hour
     const refreshTokenValidity = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -132,11 +159,25 @@ const clientLoginController = async (req: Request, res: Response, next: NextFunc
     };
 
     // Create JwtPayload instance for Access Token
-    const accessTokenPayload = new JwtPayload(issuer, audience, subject, param, accessTokenValidity, user);
+    const accessTokenPayload = new JwtPayload(
+      issuer,
+      audience,
+      subject,
+      param,
+      accessTokenValidity,
+      user
+    );
     const accessToken = await JWT.encode(accessTokenPayload);
 
     // Create JwtPayload instance for Refresh Token
-    const refreshTokenPayload = new JwtPayload(issuer, audience, subject, param, refreshTokenValidity, user);
+    const refreshTokenPayload = new JwtPayload(
+      issuer,
+      audience,
+      subject,
+      param,
+      refreshTokenValidity,
+      user
+    );
     const refreshToken = await JWT.encode(refreshTokenPayload);
 
     return res.json({
@@ -147,13 +188,14 @@ const clientLoginController = async (req: Request, res: Response, next: NextFunc
           firstName: client?.firstName,
           lastName: client?.lastName,
           emailAddress: client?.emailAddress,
-          id: client?.id,},
+          id: client?.id,
+        },
         access_token: accessToken,
         refresh_token: refreshToken, // Optional: send refresh token to client
       },
     });
   } catch (error) {
-    console.error('Error in Client login:', error);
+    console.error("Error in Client login:", error);
     next(error);
   }
 };

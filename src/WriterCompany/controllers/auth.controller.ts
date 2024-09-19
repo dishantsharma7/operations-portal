@@ -1,16 +1,23 @@
-import { CookieOptions, NextFunction, Request, Response } from 'express';
-import { InternalErrorResponse, SuccessMsgResponse, SuccessResponse } from '../../core/ApiResponse';
-import * as AuthService from '../services/auth.services';
-import { AuthFailureError, BadRequestError } from '../../core/ApiError';
-import { comparePassword } from '../../core/utils';
-import JWT, { JwtPayload } from '../../core/JWT';
-import { cookieOptions } from '../../utils/cookieOptions';
-import prisma_client from '../../config/prisma';
-import { generateUniqueUsername } from '../../utils/generateUserName';
-
+import { CookieOptions, NextFunction, Request, Response } from "express";
+import {
+  InternalErrorResponse,
+  SuccessMsgResponse,
+  SuccessResponse,
+} from "../../core/ApiResponse";
+import * as AuthService from "../services/auth.services";
+import { AuthFailureError, BadRequestError } from "../../core/ApiError";
+import { comparePassword } from "../../core/utils";
+import JWT, { JwtPayload } from "../../core/JWT";
+import { cookieOptions } from "../../utils/cookieOptions";
+import prisma_client from "../../config/prisma";
+import { generateUniqueUsername } from "../../utils/generateUserName";
 
 // Writer Company Users
-const checkNewWriterCompanyEmailValidityController = async (req: Request, res: Response, next: NextFunction) => {
+const checkNewWriterCompanyEmailValidityController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { email } = req.body;
 
@@ -31,19 +38,26 @@ const checkNewWriterCompanyEmailValidityController = async (req: Request, res: R
       const result = await generateUniqueUsername(formattedValue);
       generatedUsernames = result.username;
 
-      const existingUsername = await prisma_client.writer_company_user.findUnique({
-        where: { username: generatedUsernames },
-      });
+      const existingUsername =
+        await prisma_client.writer_company_user.findUnique({
+          where: { username: generatedUsernames },
+        });
 
       isUsernameUnique = !existingUsername;
     }
 
-    return new SuccessResponse(`Email is valid`, { username: generatedUsernames }).send(res);
+    return new SuccessResponse(`Email is valid`, {
+      username: generatedUsernames,
+    }).send(res);
   } catch (error) {
     next(error);
   }
 };
-const checkNewWriterCompanyPhoneValidityController = async (req: Request, res: Response, next: NextFunction) => {
+const checkNewWriterCompanyPhoneValidityController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { phoneNumber } = req.body;
 
@@ -61,7 +75,11 @@ const checkNewWriterCompanyPhoneValidityController = async (req: Request, res: R
     next(error);
   }
 };
-const checkNewWriterCompanyUsernameValidityController = async (req: Request, res: Response, next: NextFunction) => {
+const checkNewWriterCompanyUsernameValidityController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { username } = req.body;
 
@@ -80,63 +98,92 @@ const checkNewWriterCompanyUsernameValidityController = async (req: Request, res
   }
 };
 
-const writerCompanyRegisterController = async (req: Request, res: Response, next: NextFunction) => {
+const writerCompanyRegisterController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const writerCompanyRegisterData = req.body;
-    const userRegistrationResponse = await AuthService.writerCompanyRegisterService(writerCompanyRegisterData);
+    const userRegistrationResponse =
+      await AuthService.writerCompanyRegisterService(writerCompanyRegisterData);
     return userRegistrationResponse.send(res);
   } catch (error) {
-    console.log('🚀 ~ writerCompanyRegisterController ~ error:', error);
+    console.log("🚀 ~ writerCompanyRegisterController ~ error:", error);
     next(error);
   }
 };
 
 const secureCookieOptions: CookieOptions = {
   httpOnly: true, // Cookie is not accessible via JavaScript
-  secure: process.env.NODE_ENV === 'production', // Cookie is sent only over HTTPS in production
-  sameSite: 'none', // Ensure this matches the allowed values
-  path: '/', // Cookie is valid for the entire domain
+  secure: process.env.NODE_ENV === "production", // Cookie is sent only over HTTPS in production
+  sameSite: "none", // Ensure this matches the allowed values
+  path: "/", // Cookie is valid for the entire domain
 };
 
-const writerCompanyLoginController = async (req: Request, res: Response, next: NextFunction) => {
+const writerCompanyLoginController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { emailAddress, password } = req.body;
 
-    const writerCompany = await AuthService.writerCompanyLoginService(emailAddress, password);
+    const writerCompany = await AuthService.writerCompanyLoginService(
+      emailAddress,
+      password
+    );
 
     if (!writerCompany) {
       throw new AuthFailureError(`User doesn't exist`);
     }
 
-    const isPasswordValid = await comparePassword(password, writerCompany.password);
+    const isPasswordValid = await comparePassword(
+      password,
+      writerCompany.password
+    );
 
     if (!isPasswordValid) {
-      throw new AuthFailureError('Incorrect password');
+      throw new AuthFailureError("Incorrect password");
     }
 
     const id = writerCompany.id;
-    const issuer = 'OPR-API';
+    const issuer = "OPR-API";
     const audience = id.toString();
     const subject = writerCompany.username;
-    const param = 'writerCompany';
+    const param = "writerCompany";
     const accessTokenValidity = 3600; // 1 hour
     // const accessTokenValidity = 60; // 1 hour
     const refreshTokenValidity = 7 * 24 * 60 * 60 * 1000; // 7 days
     // const refreshTokenValidity = 300; // 7 days
 
     const user = {
-      POCFirstName: writerCompany.POCFirstName,
-      POCLastName: writerCompany?.POCLastName,
+      POCFirstName: writerCompany.firstName,
+      POCLastName: writerCompany?.lastName,
       emailAddress: writerCompany.emailAddress,
       phoneNumber: writerCompany.phoneNumber,
     };
 
     // Create JwtPayload instance for Access Token
-    const accessTokenPayload = new JwtPayload(issuer, audience, subject, param, accessTokenValidity, user);
+    const accessTokenPayload = new JwtPayload(
+      issuer,
+      audience,
+      subject,
+      param,
+      accessTokenValidity,
+      user
+    );
     const accessToken = await JWT.encode(accessTokenPayload);
 
     // Create JwtPayload instance for Refresh Token
-    const refreshTokenPayload = new JwtPayload(issuer, audience, subject, param, refreshTokenValidity, user);
+    const refreshTokenPayload = new JwtPayload(
+      issuer,
+      audience,
+      subject,
+      param,
+      refreshTokenValidity,
+      user
+    );
     const refreshToken = await JWT.encode(refreshTokenPayload);
 
     return res.json({
@@ -144,16 +191,17 @@ const writerCompanyLoginController = async (req: Request, res: Response, next: N
       data: {
         userInfo: {
           userType: writerCompany?.userType,
-          POCFirstName: writerCompany?.POCFirstName,
-          POCLastName: writerCompany?.POCLastName,
+          POCFirstName: writerCompany?.firstName,
+          POCLastName: writerCompany?.lastName,
           emailAddress: writerCompany?.emailAddress,
-          id: writerCompany?.id,},
+          id: writerCompany?.id,
+        },
         access_token: accessToken,
         refresh_token: refreshToken, // Optional: send refresh token to writerCompany
       },
     });
   } catch (error) {
-    console.error('Error in writerCompany login:', error);
+    console.error("Error in writerCompany login:", error);
     next(error);
   }
 };

@@ -1,100 +1,144 @@
-import { CookieOptions, NextFunction, Request, Response } from 'express';
-import { InternalErrorResponse, SuccessMsgResponse, SuccessResponse } from '../../core/ApiResponse';
-import * as AuthService from '../services/auth.services';
-import { AuthFailureError, BadRequestError } from '../../core/ApiError';
-import { comparePassword } from '../../core/utils';
-import JWT, { JwtPayload } from '../../core/JWT';
-import { cookieOptions } from '../../utils/cookieOptions';
-import prisma_client from '../../config/prisma';
-import { generateUniqueUsername } from '../../utils/generateUserName';
-import { adminPermissions} from '../../utils/adminPermissionData';
+import { CookieOptions, NextFunction, Request, Response } from "express";
+import {
+  InternalErrorResponse,
+  SuccessMsgResponse,
+  SuccessResponse,
+} from "../../core/ApiResponse";
+import * as AuthService from "../services/auth.services";
+import { AuthFailureError, BadRequestError } from "../../core/ApiError";
+import { comparePassword } from "../../core/utils";
+import JWT, { JwtPayload } from "../../core/JWT";
+import { cookieOptions } from "../../utils/cookieOptions";
+import prisma_client from "../../config/prisma";
+import { generateUniqueUsername } from "../../utils/generateUserName";
+import { adminPermissions } from "../../utils/adminPermissionData";
 
 // Roles and Permissions
-const checkNewPermissionValidityController = async (req: Request, res: Response, next: NextFunction) => {
+const checkNewPermissionValidityController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { accessPermissionName } = req.body;
 
-    const formattedPermissionName = accessPermissionName.toLowerCase().replace(/\s/g, '');
+    const formattedPermissionName = accessPermissionName
+      .toLowerCase()
+      .replace(/\s/g, "");
 
     const allPermissions = await prisma_client.admin_permissions.findMany();
 
-    const roleExists = allPermissions.some((permission: any) => permission.accessPermissionName.toLowerCase().replace(/\s/g, '') === formattedPermissionName);
+    const roleExists = allPermissions.some(
+      (permission: any) =>
+        permission.accessPermissionName.toLowerCase().replace(/\s/g, "") ===
+        formattedPermissionName
+    );
 
     if (roleExists) {
-      throw new BadRequestError('Permission already exists');
+      throw new BadRequestError("Permission already exists");
     }
 
-    return new SuccessMsgResponse('Permission is valid').send(res);
+    return new SuccessMsgResponse("Permission is valid").send(res);
   } catch (error) {
     next(error);
   }
 };
-const checkNewRoleValidityController = async (req: Request, res: Response, next: NextFunction) => {
+const checkNewRoleValidityController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { roleName } = req.body;
 
-    const formattedRoleName = roleName.toLowerCase().replace(/\s/g, '');
+    const formattedRoleName = roleName.toLowerCase().replace(/\s/g, "");
 
     const allRoles = await prisma_client.admin_roles.findMany();
 
-    const roleExists = allRoles.some((role: any) => role.roleName.toLowerCase().replace(/\s/g, '') === formattedRoleName);
+    const roleExists = allRoles.some(
+      (role: any) =>
+        role.roleName.toLowerCase().replace(/\s/g, "") === formattedRoleName
+    );
 
     if (roleExists) {
-      throw new BadRequestError('Role already exists');
+      throw new BadRequestError("Role already exists");
     }
 
-    return new SuccessMsgResponse('Role is valid').send(res);
+    return new SuccessMsgResponse("Role is valid").send(res);
   } catch (error) {
     next(error);
   }
 };
 
-const createPermissionController = async (req: Request, res: Response, next: NextFunction) => {
+const createPermissionController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const permissionData = req.body;
 
-    const createPermissionResponse = await AuthService.createPermissionService(permissionData);
+    const createPermissionResponse = await AuthService.createPermissionService(
+      permissionData
+    );
 
     return createPermissionResponse?.send(res);
   } catch (error) {
-    console.log('🚀 ~ createPermissionController ~ error:', error);
+    console.log("🚀 ~ createPermissionController ~ error:", error);
     next();
   }
 };
-const createRoleController = async (req: Request, res: Response, next: NextFunction) => {
+const createRoleController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const roleData = req.body;
 
     const createRoleResponse = await AuthService.createRoleService(roleData);
     return createRoleResponse?.send(res);
   } catch (error) {
-    console.log('🚀 ~ createRoleController ~ error:', error);
+    console.log("🚀 ~ createRoleController ~ error:", error);
     next();
   }
 };
 
-const getAllPermissionController = async (req: Request, res: Response, next: NextFunction) => {
+const getAllPermissionController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const fetchAllPermissionResponse = await AuthService.getAllPermissionService();
+    const fetchAllPermissionResponse =
+      await AuthService.getAllPermissionService();
     return fetchAllPermissionResponse.send(res);
   } catch (error) {
-    console.log('🚀 ~ fetchAllPermissionController ~ error:', error);
+    console.log("🚀 ~ fetchAllPermissionController ~ error:", error);
     next();
   }
 };
 
-const getAllRoleController = async (req: Request, res: Response, next: NextFunction) => {
+const getAllRoleController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const fetchAllRoleResponse = await AuthService.getAllRoleService();
     return fetchAllRoleResponse.send(res);
   } catch (error) {
-    console.log('🚀 ~ fetchAllRoleController ~ error:', error);
+    console.log("🚀 ~ fetchAllRoleController ~ error:", error);
     next();
   }
 };
 
 // Admin Users
-const checkNewAdminEmailValidityController = async (req: Request, res: Response, next: NextFunction) => {
+const checkNewAdminEmailValidityController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { email } = req.body;
 
@@ -122,18 +166,24 @@ const checkNewAdminEmailValidityController = async (req: Request, res: Response,
       isUsernameUnique = !existingUsername;
     }
 
-    return new SuccessResponse(`Email is valid`, { username: generatedUsernames }).send(res);
+    return new SuccessResponse(`Email is valid`, {
+      username: generatedUsernames,
+    }).send(res);
   } catch (error) {
     next(error);
   }
 };
-const checkNewAdminPhoneValidityController = async (req: Request, res: Response, next: NextFunction) => {
+const checkNewAdminPhoneValidityController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { phoneNumber } = req.body;
 
     const formattedValue = phoneNumber.toLowerCase().trim();
     const admin = await prisma_client.admin_user.findUnique({
-      where: { phoneNumber: formattedValue },
+      where: { phoneNumber: formattedValue }, // set phone number to unique in prisma
     });
 
     if (admin?.id) {
@@ -145,7 +195,11 @@ const checkNewAdminPhoneValidityController = async (req: Request, res: Response,
     next(error);
   }
 };
-const checkNewAdminUsernameValidityController = async (req: Request, res: Response, next: NextFunction) => {
+const checkNewAdminUsernameValidityController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { username } = req.body;
 
@@ -164,25 +218,35 @@ const checkNewAdminUsernameValidityController = async (req: Request, res: Respon
   }
 };
 
-const adminRegisterController = async (req: Request, res: Response, next: NextFunction) => {
+const adminRegisterController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const adminRegisterData = req.body;
-    const userRegistrationResponse = await AuthService.adminRegisterService(adminRegisterData);
+    const userRegistrationResponse = await AuthService.adminRegisterService(
+      adminRegisterData
+    );
     return userRegistrationResponse.send(res);
   } catch (error) {
-    console.log('🚀 ~ adminRegisterController ~ error:', error);
+    console.log("🚀 ~ adminRegisterController ~ error:", error);
     next(error);
   }
 };
 
 const secureCookieOptions: CookieOptions = {
   httpOnly: true, // Cookie is not accessible via JavaScript
-  secure: process.env.NODE_ENV === 'production', // Cookie is sent only over HTTPS in production
-  sameSite: 'none', // Ensure this matches the allowed values
-  path: '/', // Cookie is valid for the entire domain
+  secure: process.env.NODE_ENV === "production", // Cookie is sent only over HTTPS in production
+  sameSite: "none", // Ensure this matches the allowed values
+  path: "/", // Cookie is valid for the entire domain
 };
 
-const adminLoginController = async (req: Request, res: Response, next: NextFunction) => {
+const adminLoginController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { emailAddress, password } = req.body;
 
@@ -195,14 +259,14 @@ const adminLoginController = async (req: Request, res: Response, next: NextFunct
     const isPasswordValid = await comparePassword(password, admin.password);
 
     if (!isPasswordValid) {
-      throw new AuthFailureError('Incorrect password');
+      throw new AuthFailureError("Incorrect password");
     }
 
     const id = admin.id;
-    const issuer = 'OPR-API';
+    const issuer = "OPR-API";
     const audience = id.toString();
     const subject = admin.username;
-    const param = 'admin';
+    const param = "admin";
     const accessTokenValidity = 3600; // 1 hour
     // const accessTokenValidity = 60; // 1 hour
     const refreshTokenValidity = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -217,11 +281,25 @@ const adminLoginController = async (req: Request, res: Response, next: NextFunct
     };
 
     // Create JwtPayload instance for Access Token
-    const accessTokenPayload = new JwtPayload(issuer, audience, subject, param, accessTokenValidity, user);
+    const accessTokenPayload = new JwtPayload(
+      issuer,
+      audience,
+      subject,
+      param,
+      accessTokenValidity,
+      user
+    );
     const accessToken = await JWT.encode(accessTokenPayload);
 
     // Create JwtPayload instance for Refresh Token
-    const refreshTokenPayload = new JwtPayload(issuer, audience, subject, param, refreshTokenValidity, user);
+    const refreshTokenPayload = new JwtPayload(
+      issuer,
+      audience,
+      subject,
+      param,
+      refreshTokenValidity,
+      user
+    );
     const refreshToken = await JWT.encode(refreshTokenPayload);
 
     return res.json({
@@ -234,14 +312,14 @@ const adminLoginController = async (req: Request, res: Response, next: NextFunct
           emailAddress: admin?.emailAddress,
           id: admin?.id,
           restaurantID: null,
-          permissions: admin?.admin_roles?.admin_permissions,
+          // permissions: admin?.admin_roles?.admin_permission;
         },
         access_token: accessToken,
         refresh_token: refreshToken, // Optional: send refresh token to client
       },
     });
   } catch (error) {
-    console.error('Error in admin login:', error);
+    console.error("Error in admin login:", error);
     next(error);
   }
 };
@@ -289,25 +367,30 @@ const adminLoginController = async (req: Request, res: Response, next: NextFunct
 //   }
 // };
 
-const createBulkPermissionsController = async (req: Request, res: Response, next: NextFunction) => {
+const createBulkPermissionsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const adminPermissionData = adminPermissions;
-    const restaurantPermissionData = restaurantPermissions;
+    // const restaurantPermissionData = restaurantPermissions;
 
-    const adminPermissionsResponse = await prisma_client.admin_permissions.createMany({
-      data: adminPermissionData,
-      skipDuplicates: true,
-    });
-    const restaurantPermissionResponse = await prisma_client.restaurant_permissions.createMany({
-      data: restaurantPermissionData,
-      skipDuplicates: true,
-    });
+    const adminPermissionsResponse =
+      await prisma_client.admin_permissions.createMany({
+        data: adminPermissionData,
+        skipDuplicates: true,
+      });
+    // const restaurantPermissionResponse = await prisma_client.restaurant_permissions.createMany({
+    //   data: restaurantPermissionData,
+    //   skipDuplicates: true,
+    // });
 
-    if (!adminPermissionsResponse || !restaurantPermissionResponse) {
-      throw new BadRequestError('Failed to create permissions');
+    if (!adminPermissionsResponse) {
+      throw new BadRequestError("Failed to create permissions");
     }
 
-    return new SuccessMsgResponse('Permissions created').send(res);
+    return new SuccessMsgResponse("Permissions created").send(res);
   } catch (error) {
     next(error);
   }

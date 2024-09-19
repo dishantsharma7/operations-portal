@@ -1,7 +1,6 @@
 export interface clientRegisterInterface {
-
   firstName: string;
-  lastName?: string;
+  lastName: string;
   emailAddress: string;
   password: string;
   username: string;
@@ -16,6 +15,8 @@ export interface clientRegisterInterface {
   gender: string;
   dateOfBirth: string;
   userImage: string;
+  createdBy: string;
+  updatedBy: string;
 }
 
 export interface clientDetailsInterface {
@@ -36,4 +37,3 @@ export interface clientDetailsInterface {
   dateOfBirth?: string;
   userImage?: string;
 }
-

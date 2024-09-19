@@ -10,9 +10,8 @@ export interface createAdminRolesInterface {
 }
 
 export interface adminRegisterInterface {
-
   firstName: string;
-  lastName?: string;
+  lastName: string;
   emailAddress: string;
   password: string;
   username: string;
@@ -28,6 +27,9 @@ export interface adminRegisterInterface {
   gender: string;
   dateOfBirth: string;
   userImage: string;
+  adminRoleID: string;
+  createdBy: string;
+  updatedBy: string;
 }
 
 export interface adminDetailsInterface {
@@ -54,4 +56,3 @@ export interface adminDetailsInterface {
     roleName: string;
   };
 }
-

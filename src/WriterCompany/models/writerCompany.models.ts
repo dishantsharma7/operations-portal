@@ -1,8 +1,7 @@
 export interface writerCompanyRegisterInterface {
-
   companyName: string;
-  POCFirstName: string;
-  POCLastName?: string;
+  firstName: string;
+  lastName: string;
   emailAddress: string;
   password: string;
   username: string;
@@ -14,11 +13,13 @@ export interface writerCompanyRegisterInterface {
   country: string;
   zipcode: number;
   countryCode: string;
+  createdBy: string;
+  updatedBy: string;
 }
 
 export interface writerCompanyDetailsInterface {
-  POCFirstName: string;
-  POCLastName?: string;
+  firstName: string;
+  lastName?: string;
   emailAddress: string;
   password: string;
   username: string;
@@ -31,4 +32,3 @@ export interface writerCompanyDetailsInterface {
   zipcode?: number;
   countryCode?: string;
 }
-

@@ -1,8 +1,7 @@
 export interface writerRegisterInterface {
-
   writerCompanyID: string;
   firstName: string;
-  lastName?: string;
+  lastName: string;
   emailAddress: string;
   password: string;
   username: string;
@@ -17,10 +16,11 @@ export interface writerRegisterInterface {
   gender: string;
   dateOfBirth: string;
   userImage: string;
+  createdBy: string;
+  updatedBy: string;
 }
 
 export interface writerDetailsInterface {
-
   writerCompanyID: string;
   firstName: string;
   lastName?: string;
@@ -39,4 +39,3 @@ export interface writerDetailsInterface {
   dateOfBirth?: string;
   userImage?: string;
 }
-
