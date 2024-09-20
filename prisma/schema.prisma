@@ -43,6 +43,8 @@ model admin_user {
 
   // Relations
   // adminRole   
+  jobs          job_details[]
+
 
 }
 
@@ -70,6 +72,10 @@ model client_user {
   enabled       Boolean  @default(true)
   createdBy     String
   updatedBy     String
+
+  //Relations
+  jobs          job_details[]
+
 }
 
 model writer_company_user {
@@ -170,4 +176,33 @@ model department{
   updatedAt            DateTime      @updatedAt
   enabled              Boolean       @default(true)
   writer_users          writer_user[]
+}
+
+
+model job_details {
+  id               String       @id @default(uuid())
+  clientID         String
+  adminID          String
+  salesAdminID     String?
+  writerID         String?
+  jobTitle         String
+  jobDescription   String?
+  jobDeadline      DateTime
+  finalQuotationID String?
+  jobAmount        Float
+  jobTaxAmount     Float
+  jobFinalAmount   Float
+  completionDate   DateTime?
+  completionStatus String     @default("Pending")
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  enabled          Boolean    @default(true)
+
+  // Relations
+  client           client_user      @relation(fields: [clientID], references: [id])
+  admin            admin_user       @relation(fields: [adminID], references: [id])
+  // writer           writerUser      @relation(fields: [writerID], references: [id])
+  // finalQuotation   quotationDetails @relation(fields: [finalQuotationID], references: [id])
+
+  @@map("job_details")
 }
