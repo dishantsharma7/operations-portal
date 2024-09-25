@@ -226,7 +226,7 @@ model job_files {
 
 model quotation_details {
   id              String    @id @default(uuid())
-  writerID        String    // You can replace this with a relation to a writer model if applicable
+  writerID        String    
   jobDetailsID    String
   durationDetails String
   quotationAmount Float
@@ -235,6 +235,5 @@ model quotation_details {
   enabled         Boolean   @default(true)
 //relations
   jobDetails      job_details @relation(fields: [jobDetailsID], references: [id])
-
 }
 
