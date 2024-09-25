@@ -199,6 +199,7 @@ model job_details {
   enabled          Boolean    @default(true)
   jobFiles        job_files[]
   quotationDetails quotation_details[]
+  jobCommunications job_communications[]
 
   // Relations
   client           client_user      @relation(fields: [clientID], references: [id])
@@ -237,3 +238,18 @@ model quotation_details {
   jobDetails      job_details @relation(fields: [jobDetailsID], references: [id])
 }
 
+model job_communications {
+  id                    String   @id @default(uuid())
+  jobDetailsID          String
+  communicationSender   String   
+  communicationMessage  String
+  anonymityStatus       Boolean  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  enabled               Boolean  @default(true)
+
+  // Relation to jobDetails
+  jobDetails            job_details @relation(fields: [jobDetailsID], references: [id])
+
+
+}
