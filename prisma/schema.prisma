@@ -197,6 +197,8 @@ model job_details {
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
   enabled          Boolean    @default(true)
+  jobFiles        job_files[]
+  quotationDetails quotation_details[]
 
   // Relations
   client           client_user      @relation(fields: [clientID], references: [id])
@@ -204,5 +206,35 @@ model job_details {
   // writer           writerUser      @relation(fields: [writerID], references: [id])
   // finalQuotation   quotationDetails @relation(fields: [finalQuotationID], references: [id])
 
-  @@map("job_details")
 }
+
+model job_files {
+  id              String    @id @default(uuid())
+  jobDetailsID    String
+  fileName        String
+  fileDescription String?
+  fileUploadLink  String
+  uploadedBy      String    // You can replace this with a relation to a user model if applicable
+  uploadedAt      DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  enabled         Boolean   @default(true)
+
+//relations
+  jobDetails      job_details @relation(fields: [jobDetailsID], references: [id])
+
+}
+
+model quotation_details {
+  id              String    @id @default(uuid())
+  writerID        String    // You can replace this with a relation to a writer model if applicable
+  jobDetailsID    String
+  durationDetails String
+  quotationAmount Float
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  enabled         Boolean   @default(true)
+//relations
+  jobDetails      job_details @relation(fields: [jobDetailsID], references: [id])
+
+}
+
