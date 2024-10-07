@@ -34,7 +34,7 @@ model admin_user {
   password      String
   userImage     String?
   userType      String   @default("admin")
-  adminRoleID   String
+  adminRoleID   String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   enabled       Boolean  @default(true)
@@ -44,6 +44,7 @@ model admin_user {
   // Relations
   // adminRole   
   jobs          job_details[]
+  adminRole     admin_roles? @relation(fields: [adminRoleID], references: [id]) 
 
 
 }
@@ -137,6 +138,8 @@ model writer_user {
 
   // Relations
  writerCompany   writer_company_user @relation(fields: [writerCompanyID], references: [id])
+ jobs            job_details[]       
+ quotations      quotation_details[]
 }
 
 model admin_roles {
@@ -147,6 +150,7 @@ model admin_roles {
   updatedAt         DateTime            @updatedAt
   enabled           Boolean             @default(true)
   admin_permissions admin_permissions[] @relation("admin_permissionsToadmin_roles")
+  admins            admin_user[]     
 }
 
 model admin_permissions {
@@ -204,8 +208,8 @@ model job_details {
   // Relations
   client           client_user      @relation(fields: [clientID], references: [id])
   admin            admin_user       @relation(fields: [adminID], references: [id])
-  // writer           writerUser      @relation(fields: [writerID], references: [id])
-  // finalQuotation   quotationDetails @relation(fields: [finalQuotationID], references: [id])
+  writer            writer_user? @relation(fields: [writerID], references: [id])
+  // finalQuotation    quotation_details? @relation(fields: [finalQuotationID], references: [id])
 
 }
 
@@ -236,6 +240,7 @@ model quotation_details {
   enabled         Boolean   @default(true)
 //relations
   jobDetails      job_details @relation(fields: [jobDetailsID], references: [id])
+  writer          writer_user @relation(fields: [writerID], references: [id])
 }
 
 model job_communications {

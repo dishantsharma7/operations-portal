@@ -10,12 +10,12 @@ const createNewQuotationDetailsMethod = async (
     "🚀 ~ createNewQuotationDetailsMethod ~ QuotationDetailData:",
     QuotationDetailData
   );
-  //   const existingJob = await prisma_client.quotation_details.findFirst({
+  //   const existingQuotation = await prisma_client.quotation_details.findFirst({
   //     where: { date: QuotationDetailData.date },
   //   });
 
   //   if (existingReading) {
-  //     throw new BadRequestError("Job Detail for this date already exists!");
+  //     throw new BadRequestError("Quotation Detail for this date already exists!");
   //   }
 
   const addedReading = await prisma_client.quotation_details.create({
@@ -26,10 +26,10 @@ const createNewQuotationDetailsMethod = async (
   });
 
   if (!addedReading) {
-    throw new BadRequestError("Failed to add new Job Detail ");
+    throw new BadRequestError("Failed to add new Quotation Detail ");
   }
 
-  return new SuccessResponse("Added new Job Detail", addedReading);
+  return new SuccessResponse("Added new Quotation Detail", addedReading);
 };
 
 const getQuotationDetailsMethod = async (QuotationDetailId: string) => {
@@ -40,10 +40,10 @@ const getQuotationDetailsMethod = async (QuotationDetailId: string) => {
   });
 
   if (!QuotationDetailsData) {
-    throw new BadRequestError("No Job Detail found!");
+    throw new BadRequestError("No Quotation Detail found!");
   }
 
-  return new SuccessResponse("Fetched Job Detail ", QuotationDetailsData);
+  return new SuccessResponse("Fetched Quotation Detail ", QuotationDetailsData);
 };
 
 const updateQuotationDetailsMethod = async (
@@ -60,7 +60,7 @@ const updateQuotationDetailsMethod = async (
     });
 
   if (!existingQuotationDetailData) {
-    throw new BadRequestError("Job Detail does not exist!");
+    throw new BadRequestError("Quotation Detail does not exist!");
   }
 
   const updatedQuotationDetailData =
@@ -72,11 +72,11 @@ const updateQuotationDetailsMethod = async (
     });
 
   if (!updatedQuotationDetailData) {
-    throw new BadRequestError("Failed to update Job Detail");
+    throw new BadRequestError("Failed to update Quotation Detail");
   }
 
   return new SuccessResponse(
-    "Job Detail updated successfully",
+    "Quotation Detail updated successfully",
     updatedQuotationDetailData
   );
 };
@@ -88,13 +88,13 @@ const deleteQuotationDetailMethod = async (QuotationDetailId: string) => {
     });
 
   if (!existingQuotationDetail) {
-    throw new BadRequestError("Job Detail does not exist!");
+    throw new BadRequestError("Quotation Detail does not exist!");
   } else {
     await prisma_client.quotation_details.delete({
       where: { id: QuotationDetailId },
     });
 
-    return new SuccessMsgResponse("Job Detail deleted successfully");
+    return new SuccessMsgResponse("Quotation Detail deleted successfully");
   }
 };
 

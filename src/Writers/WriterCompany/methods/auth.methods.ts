@@ -1,12 +1,12 @@
-import prisma_client from "../../config/prisma";
-import { BadRequestError } from "../../core/ApiError";
+import prisma_client from "../../../config/prisma";
+import { BadRequestError } from "../../../core/ApiError";
 import {
   BadRequestResponse,
   FailureMsgResponse,
   InternalErrorResponse,
   SuccessResponse,
-} from "../../core/ApiResponse";
-import { hashPassword } from "../../core/utils";
+} from "../../../core/ApiResponse";
+import { hashPassword } from "../../../core/utils";
 import { writerCompanyRegisterInterface } from "../models/writerCompany.models";
 
 //   Writer Company User

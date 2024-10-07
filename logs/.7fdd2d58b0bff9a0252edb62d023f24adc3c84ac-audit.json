@@ -1,0 +1,20 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/Users/dshxnt/Desktop/CDL/operations-portal/logs/.7fdd2d58b0bff9a0252edb62d023f24adc3c84ac-audit.json",
+    "files": [
+        {
+            "date": 1727987417574,
+            "name": "/Users/dshxnt/Desktop/CDL/operations-portal/logs/2024-10-04.log",
+            "hash": "87bbd7466f2806404f9e06e2aa5fe940875ff7b90a535c3d76d6e0115aa1a041"
+        },
+        {
+            "date": 1728333464802,
+            "name": "/Users/dshxnt/Desktop/CDL/operations-portal/logs/2024-10-08.log",
+            "hash": "c9d05355abe8c6e7d6076d93c2aee0e224663458cb5ff5e1b35d91742a72b2f3"
+        }
+    ],
+    "hashType": "sha256"
+}

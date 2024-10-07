@@ -3,17 +3,17 @@ import {
   InternalErrorResponse,
   SuccessMsgResponse,
   SuccessResponse,
-} from "../../core/ApiResponse";
+} from "../../../core/ApiResponse";
 import * as AuthService from "../services/auth.services";
-import { AuthFailureError, BadRequestError } from "../../core/ApiError";
-import { comparePassword } from "../../core/utils";
-import JWT, { JwtPayload } from "../../core/JWT";
-import { cookieOptions } from "../../utils/cookieOptions";
-import prisma_client from "../../config/prisma";
-import { generateUniqueUsername } from "../../utils/generateUserName";
+import { AuthFailureError, BadRequestError } from "../../../core/ApiError";
+import { comparePassword } from "../../../core/utils";
+import JWT, { JwtPayload } from "../../../core/JWT";
+import { cookieOptions } from "../../../utils/cookieOptions";
+import prisma_client from "../../../config/prisma";
+import { generateUniqueUsername } from "../../../utils/generateUserName";
 
 // Writer Company Users
-const checkNewWriterCompanyEmailValidityController = async (
+const checkNewWriterEmailValidityController = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -22,11 +22,11 @@ const checkNewWriterCompanyEmailValidityController = async (
     const { email } = req.body;
 
     const formattedValue = email.toLowerCase().trim();
-    const writerCompany = await prisma_client.writer_company_user.findUnique({
+    const writer = await prisma_client.writer_user.findUnique({
       where: { emailAddress: formattedValue },
     });
 
-    if (writerCompany?.id) {
+    if (writer?.id) {
       throw new BadRequestError(`Email already exists`);
     }
 
@@ -38,10 +38,9 @@ const checkNewWriterCompanyEmailValidityController = async (
       const result = await generateUniqueUsername(formattedValue);
       generatedUsernames = result.username;
 
-      const existingUsername =
-        await prisma_client.writer_company_user.findUnique({
-          where: { username: generatedUsernames },
-        });
+      const existingUsername = await prisma_client.writer_user.findUnique({
+        where: { username: generatedUsernames },
+      });
 
       isUsernameUnique = !existingUsername;
     }
@@ -53,7 +52,7 @@ const checkNewWriterCompanyEmailValidityController = async (
     next(error);
   }
 };
-const checkNewWriterCompanyPhoneValidityController = async (
+const checkNewWriterPhoneValidityController = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -62,11 +61,11 @@ const checkNewWriterCompanyPhoneValidityController = async (
     const { phoneNumber } = req.body;
 
     const formattedValue = phoneNumber.toLowerCase().trim();
-    const writerCompany = await prisma_client.writer_company_user.findUnique({
+    const writer = await prisma_client.writer_company_user.findUnique({
       where: { phoneNumber: formattedValue },
     });
 
-    if (writerCompany?.id) {
+    if (writer?.id) {
       throw new BadRequestError(`Phone Number already exists`);
     }
 
@@ -75,7 +74,7 @@ const checkNewWriterCompanyPhoneValidityController = async (
     next(error);
   }
 };
-const checkNewWriterCompanyUsernameValidityController = async (
+const checkNewWriterUsernameValidityController = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -84,11 +83,11 @@ const checkNewWriterCompanyUsernameValidityController = async (
     const { username } = req.body;
 
     const formattedValue = username.trim();
-    const writerCompany = await prisma_client.writer_company_user.findUnique({
+    const writer = await prisma_client.writer_company_user.findUnique({
       where: { username: username },
     });
 
-    if (writerCompany?.id) {
+    if (writer?.id) {
       throw new BadRequestError(`Username already exists`);
     }
 
@@ -98,18 +97,19 @@ const checkNewWriterCompanyUsernameValidityController = async (
   }
 };
 
-const writerCompanyRegisterController = async (
+const writerRegisterController = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const writerCompanyRegisterData = req.body;
-    const userRegistrationResponse =
-      await AuthService.writerCompanyRegisterService(writerCompanyRegisterData);
+    const writerRegisterData = req.body;
+    const userRegistrationResponse = await AuthService.writerRegisterService(
+      writerRegisterData
+    );
     return userRegistrationResponse.send(res);
   } catch (error) {
-    console.log("🚀 ~ writerCompanyRegisterController ~ error:", error);
+    console.log("🚀 ~ writerRegisterController ~ error:", error);
     next(error);
   }
 };
@@ -121,7 +121,7 @@ const secureCookieOptions: CookieOptions = {
   path: "/", // Cookie is valid for the entire domain
 };
 
-const writerCompanyLoginController = async (
+const writerLoginController = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -129,39 +129,33 @@ const writerCompanyLoginController = async (
   try {
     const { emailAddress, password } = req.body;
 
-    const writerCompany = await AuthService.writerCompanyLoginService(
-      emailAddress,
-      password
-    );
+    const writer = await AuthService.writerLoginService(emailAddress, password);
 
-    if (!writerCompany) {
+    if (!writer) {
       throw new AuthFailureError(`User doesn't exist`);
     }
 
-    const isPasswordValid = await comparePassword(
-      password,
-      writerCompany.password
-    );
+    const isPasswordValid = await comparePassword(password, writer.password);
 
     if (!isPasswordValid) {
       throw new AuthFailureError("Incorrect password");
     }
 
-    const id = writerCompany.id;
+    const id = writer.id;
     const issuer = "OPR-API";
     const audience = id.toString();
-    const subject = writerCompany.username;
-    const param = "writerCompany";
+    const subject = writer.username;
+    const param = "writer";
     const accessTokenValidity = 3600; // 1 hour
     // const accessTokenValidity = 60; // 1 hour
     const refreshTokenValidity = 7 * 24 * 60 * 60 * 1000; // 7 days
     // const refreshTokenValidity = 300; // 7 days
 
     const user = {
-      POCFirstName: writerCompany.firstName,
-      POCLastName: writerCompany?.lastName,
-      emailAddress: writerCompany.emailAddress,
-      phoneNumber: writerCompany.phoneNumber,
+      firstName: writer.firstName,
+      lastName: writer?.lastName,
+      emailAddress: writer.emailAddress,
+      phoneNumber: writer.phoneNumber,
     };
 
     // Create JwtPayload instance for Access Token
@@ -190,18 +184,18 @@ const writerCompanyLoginController = async (
       success: true,
       data: {
         userInfo: {
-          userType: writerCompany?.userType,
-          POCFirstName: writerCompany?.firstName,
-          POCLastName: writerCompany?.lastName,
-          emailAddress: writerCompany?.emailAddress,
-          id: writerCompany?.id,
+          userType: writer?.userType,
+          firstName: writer?.firstName,
+          lastName: writer?.lastName,
+          emailAddress: writer?.emailAddress,
+          id: writer?.id,
         },
         access_token: accessToken,
-        refresh_token: refreshToken, // Optional: send refresh token to writerCompany
+        refresh_token: refreshToken, // Optional: send refresh token to writer
       },
     });
   } catch (error) {
-    console.error("Error in writerCompany login:", error);
+    console.error("Error in writer login:", error);
     next(error);
   }
 };
@@ -250,9 +244,9 @@ const writerCompanyLoginController = async (
 // };
 
 export {
-  writerCompanyRegisterController,
-  writerCompanyLoginController,
-  checkNewWriterCompanyEmailValidityController,
-  checkNewWriterCompanyUsernameValidityController,
-  checkNewWriterCompanyPhoneValidityController,
+  writerRegisterController,
+  writerLoginController,
+  checkNewWriterEmailValidityController,
+  checkNewWriterUsernameValidityController,
+  checkNewWriterPhoneValidityController,
 };

@@ -5,13 +5,6 @@ import { JobFilesInterface } from "../models/jobFiles.models";
 
 const createNewJobFilesMethod = async (JobFileData: JobFilesInterface) => {
   console.log("🚀 ~ createNewJobFilesMethod ~ JobFileData:", JobFileData);
-  //   const existingJob = await prisma_client.job_files.findFirst({
-  //     where: { date: JobFileData.date },
-  //   });
-
-  //   if (existingReading) {
-  //     throw new BadRequestError("Job Detail for this date already exists!");
-  //   }
 
   const addedReading = await prisma_client.job_files.create({
     data: {
@@ -21,10 +14,10 @@ const createNewJobFilesMethod = async (JobFileData: JobFilesInterface) => {
   });
 
   if (!addedReading) {
-    throw new BadRequestError("Failed to add new Job Detail ");
+    throw new BadRequestError("Failed to add new Job File ");
   }
 
-  return new SuccessResponse("Added new Job Detail", addedReading);
+  return new SuccessResponse("Added new Job File", addedReading);
 };
 
 const getJobFilesMethod = async (JobFileId: string) => {
@@ -35,10 +28,10 @@ const getJobFilesMethod = async (JobFileId: string) => {
   });
 
   if (!JobFilesData) {
-    throw new BadRequestError("No Job Detail found!");
+    throw new BadRequestError("No Job File found!");
   }
 
-  return new SuccessResponse("Fetched Job Detail ", JobFilesData);
+  return new SuccessResponse("Fetched Job File ", JobFilesData);
 };
 
 const updateJobFilesMethod = async (
@@ -51,7 +44,7 @@ const updateJobFilesMethod = async (
   });
 
   if (!existingJobFileData) {
-    throw new BadRequestError("Job Detail does not exist!");
+    throw new BadRequestError("Job File does not exist!");
   }
 
   const updatedJobFileData = await prisma_client.job_files.update({
@@ -62,11 +55,11 @@ const updateJobFilesMethod = async (
   });
 
   if (!updatedJobFileData) {
-    throw new BadRequestError("Failed to update Job Detail");
+    throw new BadRequestError("Failed to update Job File");
   }
 
   return new SuccessResponse(
-    "Job Detail updated successfully",
+    "Job File updated successfully",
     updatedJobFileData
   );
 };
@@ -77,13 +70,13 @@ const deleteJobFileMethod = async (JobFileId: string) => {
   });
 
   if (!existingJobFile) {
-    throw new BadRequestError("Job Detail does not exist!");
+    throw new BadRequestError("Job File does not exist!");
   } else {
     await prisma_client.job_files.delete({
       where: { id: JobFileId },
     });
 
-    return new SuccessMsgResponse("Job Detail deleted successfully");
+    return new SuccessMsgResponse("Job File deleted successfully");
   }
 };
 

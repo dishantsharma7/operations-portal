@@ -1,12 +1,12 @@
-import prisma_client from "../../config/prisma";
-import { BadRequestError } from "../../core/ApiError";
+import prisma_client from "../../../config/prisma";
+import { BadRequestError } from "../../../core/ApiError";
 import {
   BadRequestResponse,
   FailureMsgResponse,
   InternalErrorResponse,
   SuccessResponse,
-} from "../../core/ApiResponse";
-import { hashPassword } from "../../core/utils";
+} from "../../../core/ApiResponse";
+import { hashPassword } from "../../../core/utils";
 import { writerRegisterInterface } from "../models/writer.models";
 
 //   Writer Company User
@@ -51,7 +51,7 @@ const RegisterWriterMethod = async (
     throw new BadRequestError("Failed to register new Writer Company");
   }
   return new SuccessResponse(
-    "Writer Company registered successfully",
+    "Writer User registered successfully",
     registeredUser
   );
 };
