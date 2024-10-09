@@ -1,6 +1,10 @@
 import express, { NextFunction, Request, Response, Router } from "express";
 import { SuccessMsgResponse } from "../../core/ApiResponse";
 import * as jobCommunicationController from "./controllers/jobCommunications.controller";
+import {
+  isRequestValidated,
+  validateCreateJobCommunicationRequest,
+} from "./middlewares/jobCommunicationValidator";
 const jobCommunicationRouter = express.Router();
 
 jobCommunicationRouter.get("/", (req: Request, res: Response) => {
@@ -9,6 +13,8 @@ jobCommunicationRouter.get("/", (req: Request, res: Response) => {
 });
 jobCommunicationRouter.post(
   "/create",
+  validateCreateJobCommunicationRequest,
+  isRequestValidated,
   jobCommunicationController.createNewJobCommunicationController
 );
 jobCommunicationRouter.get(

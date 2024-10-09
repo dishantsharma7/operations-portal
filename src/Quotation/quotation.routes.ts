@@ -1,6 +1,10 @@
 import express, { NextFunction, Request, Response, Router } from "express";
 import { SuccessMsgResponse } from "../core/ApiResponse";
 import * as quotationController from "./controllers/quotationDetails.controller";
+import {
+  isRequestValidated,
+  validateCreateQuotationRequest,
+} from "./middlewares/quotationValidator";
 const quotationRouter = express.Router();
 
 quotationRouter.get("/", (req: Request, res: Response) => {
@@ -10,6 +14,8 @@ quotationRouter.get("/", (req: Request, res: Response) => {
 
 quotationRouter.post(
   "/create-quotation",
+  validateCreateQuotationRequest,
+  isRequestValidated,
   quotationController.createNewQuotationDetailController
 );
 quotationRouter.get(

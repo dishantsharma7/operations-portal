@@ -1,6 +1,10 @@
 import express, { NextFunction, Request, Response, Router } from "express";
 import { SuccessMsgResponse } from "../../core/ApiResponse";
 import * as writerCompanyController from "./controllers/auth.controller";
+import {
+  isRequestValidated,
+  validateWriterCompanyRegisterRequest,
+} from "./middleware/writerCompanyValidator";
 const writerCompanyUserRouter = express.Router();
 
 writerCompanyUserRouter.get("/", (req: Request, res: Response) => {
@@ -10,6 +14,8 @@ writerCompanyUserRouter.get("/", (req: Request, res: Response) => {
 
 writerCompanyUserRouter.post(
   "/register",
+  validateWriterCompanyRegisterRequest,
+  isRequestValidated,
   writerCompanyController.writerCompanyRegisterController
 );
 writerCompanyUserRouter.post(
